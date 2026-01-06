@@ -30,3 +30,10 @@ function require_fields(array $data, array $fields): array {
     }
     return $errors;
 }
+
+function json_error(string $message, int $status = 400, array $extra = []): void {
+    json_response(array_merge([
+        'ok' => false,
+        'error' => $message
+    ], $extra), $status);
+}
