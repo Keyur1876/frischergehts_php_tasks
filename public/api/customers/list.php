@@ -39,7 +39,7 @@ if ($group !== '') {
     $params['grp'] = $group;
 }
 
-$sql .= " ORDER BY c.id DESC";
+//$sql .= " ORDER BY c.id DESC";
 
 $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
