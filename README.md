@@ -1,4 +1,4 @@
-# Customer Management – PHP + AJAX
+# Customer Management – PHP + AJAX-- Task 1
 
 Small customer management tool for a delivery service.
 
