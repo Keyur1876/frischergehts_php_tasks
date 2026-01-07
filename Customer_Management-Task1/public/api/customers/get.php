@@ -1,8 +1,7 @@
 <?php
 declare(strict_types=1);
 
-require_once __DIR__ . '/../../../src/db.php';
-require_once __DIR__ . '/../../../src/helpers.php';
+require_once __DIR__ . '/../../../../config.php';
 
 $id = (int)($_GET['id'] ?? 0);
 if ($id <= 0) json_response(['ok' => false, 'error' => 'Invalid id'], 400);
