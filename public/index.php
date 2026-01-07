@@ -26,6 +26,11 @@
       <input id="first_name" placeholder="First name" required />
       <input id="last_name" placeholder="Last name" required />
       <input id="customer_group" placeholder="Group (optional)" />
+      <input id="email" placeholder="Email (optional)" />
+      <input id="phone" placeholder="Phone (optional)" />
+      <input id="street" placeholder="Street (optional)" />
+      <input id="zip" placeholder="ZIP (optional)" />
+      <input id="city" placeholder="City (optional)" />
     </div>
 
     <button type="submit">Save</button>

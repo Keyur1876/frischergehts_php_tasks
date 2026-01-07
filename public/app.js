@@ -10,6 +10,11 @@ const idEl = document.getElementById("id");
 const firstNameEl = document.getElementById("first_name");
 const lastNameEl = document.getElementById("last_name");
 const groupEl = document.getElementById("customer_group");
+const email = document.getElementById("email");
+const phone = document.getElementById("phone");
+const street = document.getElementById("street");
+const zip = document.getElementById("zip");
+const city = document.getElementById("city");
 
 // Small safety helper to avoid HTML injection
 function escapeHtml(str) {
@@ -107,7 +112,13 @@ form.addEventListener("submit", async (e) => {
     id: idEl.value ? Number(idEl.value) : null,
     first_name: firstNameEl.value.trim(),
     last_name: lastNameEl.value.trim(),
-    customer_group: groupEl.value.trim() || null
+    customer_group: groupEl.value.trim() || null,
+    email: email.value.trim() || null,
+    phone: phone.value.trim() || null,
+    street: street.value.trim() || null,
+    zip: zip.value.trim() || null,
+    city: city.value.trim() || null,
+
   };
 
   if (!payload.first_name || !payload.last_name) {
@@ -174,6 +185,11 @@ tbody.addEventListener("click", async (e) => {
     firstNameEl.value = c.first_name ?? "";
     lastNameEl.value = c.last_name ?? "";
     groupEl.value = c.customer_group ?? "";
+    email.value = c.email ?? "";
+    phone.value = c.phone ?? "";
+    street.value = c.street ?? "";
+    zip.value = c.zip ?? "";
+    city.value = c.city ?? "";
 
     setStatus(`Editing customer #${c.id}.`);
   }

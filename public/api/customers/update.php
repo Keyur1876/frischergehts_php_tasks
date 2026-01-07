@@ -16,19 +16,56 @@ if ($errors) {
 
 $pdo = db();
 
-$stmt = $pdo->prepare("
-  UPDATE customer
-  SET first_name = :first_name,
-      last_name = :last_name,
-      customer_group = :customer_group
-  WHERE id = :id
-");
+try {
+    $pdo->beginTransaction();
 
-$stmt->execute([
-    'id' => $id,
-    'first_name' => trim((string)$data['first_name']),
-    'last_name' => trim((string)$data['last_name']),
-    'customer_group' => ($data['customer_group'] ?? null) ?: null,
-]);
+    // 1) Update customer (main table)
+    $stmt = $pdo->prepare("
+        UPDATE customer
+        SET first_name = :first_name,
+            last_name = :last_name,
+            customer_group = :customer_group
+        WHERE id = :id
+    ");
+    $stmt->execute([
+        'id' => $id,
+        'first_name' => trim((string)$data['first_name']),
+        'last_name' => trim((string)$data['last_name']),
+        'customer_group' => ($data['customer_group'] ?? null) ?: null,
+    ]);
 
-json_response(['ok' => true]);
+    // 2) Update contact
+    $stmt = $pdo->prepare("
+        UPDATE customer_contact
+        SET email = :email,
+            phone = :phone
+        WHERE customer_id = :customer_id
+    ");
+    $stmt->execute([
+        'customer_id' => $id,
+        'email' => ($data['email'] ?? null) ?: null,
+        'phone' => ($data['phone'] ?? null) ?: null,
+    ]);
+
+    // 3) Update address
+    $stmt = $pdo->prepare("
+        UPDATE customer_address
+        SET street = :street,
+            zip = :zip,
+            city = :city
+        WHERE customer_id = :customer_id
+    ");
+    $stmt->execute([
+        'customer_id' => $id,
+        'street' => ($data['street'] ?? null) ?: null,
+        'zip' => ($data['zip'] ?? null) ?: null,
+        'city' => ($data['city'] ?? null) ?: null,
+    ]);
+
+    $pdo->commit();
+    json_response(['ok' => true]);
+
+} catch (Throwable $e) {
+    $pdo->rollBack();
+    json_response(['ok' => false, 'error' => 'Server error'], 500);
+}

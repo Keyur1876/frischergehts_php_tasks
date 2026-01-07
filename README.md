@@ -5,8 +5,7 @@ Small customer management tool for a delivery service.
 ## Tech
 - Plain PHP (PDO)
 - Vanilla JS (fetch/AJAX)
-- MySQL/MariaDB
-- Bootstrap (UI)
+- MySQL
 
 ## Features
 - List customers (AJAX)
@@ -20,6 +19,6 @@ Small customer management tool for a delivery service.
    `mysql -u crm_user -p delivery_crm < sql/schema.sql`
 2. Configure DB in `src/db.php`
 3. Run (dev server):
-   `php -S localhost:8000 -t .`
+   `php -S localhost:8000 -t ./public/`
 4. Open:
-   `http://localhost:8000/public/`
+   `http://localhost:8000`
