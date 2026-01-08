@@ -7,12 +7,22 @@ $(function () {
   const modal = new bootstrap.Modal(document.getElementById("catModal"));
   const $modalTitle = $("#modalTitle");
 
-  function setStatus(msg) { $status.text(msg); }
+  function setStatus(msg) {
+    $status.text(msg);
+  }
 
   function escapeHtml(str) {
-    return String(str).replace(/[&<>"']/g, s => ({
-      "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"
-    }[s]));
+    return String(str).replace(
+      /[&<>"']/g,
+      (s) =>
+        ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#039;",
+        })[s],
+    );
   }
 
   function openNew() {
@@ -33,9 +43,12 @@ $(function () {
     setStatus("Loading...");
     $.get("/api/categories/list.php")
       .done(function (json) {
-        if (!json.ok) return setStatus("Load failed: " + (json.error || "unknown"));
+        if (!json.ok)
+          return setStatus("Load failed: " + (json.error || "unknown"));
 
-        const rows = json.data.map(c => `
+        const rows = json.data
+          .map(
+            (c) => `
           <tr>
             <td>${c.id}</td>
             <td>${escapeHtml(c.name)}</td>
@@ -45,7 +58,9 @@ $(function () {
               <button class="btn btn-sm btn-outline-danger" data-action="delete" data-id="${c.id}">Delete</button>
             </td>
           </tr>
-        `).join("");
+        `,
+          )
+          .join("");
 
         $tbody.html(rows);
         setStatus(`Loaded ${json.data.length} categories.`);
@@ -63,20 +78,25 @@ $(function () {
     if (!name) return;
 
     setStatus("Saving...");
-    const url = id ? "/api/categories/update.php" : "/api/categories/create.php";
+    const url = id
+      ? "/api/categories/update.php"
+      : "/api/categories/create.php";
     const payload = id ? { id, name } : { name };
 
     $.ajax({
       url,
       method: "POST",
       contentType: "application/json",
-      data: JSON.stringify(payload)
-    }).done(function (json) {
-      if (!json.ok) return setStatus("Save failed: " + (json.error || "unknown"));
-      modal.hide();
-      setStatus(id ? "Updated." : "Created.");
-      loadCategories();
-    }).fail(() => setStatus("Request failed (network/server)."));
+      data: JSON.stringify(payload),
+    })
+      .done(function (json) {
+        if (!json.ok)
+          return setStatus("Save failed: " + (json.error || "unknown"));
+        modal.hide();
+        setStatus(id ? "Updated." : "Created.");
+        loadCategories();
+      })
+      .fail(() => setStatus("Request failed (network/server)."));
   });
 
   $tbody.on("click", "button[data-action]", function () {
@@ -91,19 +111,22 @@ $(function () {
         url: "/api/categories/delete.php",
         method: "POST",
         contentType: "application/json",
-        data: JSON.stringify({ id })
-      }).done(function (json) {
-        if (!json.ok) return setStatus("Delete failed: " + (json.error || "unknown"));
-        setStatus("Deleted.");
-        loadCategories();
-      }).fail(() => setStatus("Request failed (network/server)."));
+        data: JSON.stringify({ id }),
+      })
+        .done(function (json) {
+          if (!json.ok)
+            return setStatus("Delete failed: " + (json.error || "unknown"));
+          setStatus("Deleted.");
+          loadCategories();
+        })
+        .fail(() => setStatus("Request failed (network/server)."));
     }
 
     if (action === "edit") {
       // simplest: fetch list and find item (or call a get.php if you have one)
       $.get("/api/categories/list.php").done(function (json) {
         if (!json.ok) return setStatus("Load failed.");
-        const cat = json.data.find(x => Number(x.id) === id);
+        const cat = json.data.find((x) => Number(x.id) === id);
         if (!cat) return setStatus("Category not found.");
         openEdit(cat);
       });

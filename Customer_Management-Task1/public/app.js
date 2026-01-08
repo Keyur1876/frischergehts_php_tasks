@@ -18,13 +18,17 @@ const city = document.getElementById("city");
 
 // Small safety helper to avoid HTML injection
 function escapeHtml(str) {
-  return String(str).replace(/[&<>"']/g, (s) => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#039;",
-  }[s]));
+  return String(str).replace(
+    /[&<>"']/g,
+    (s) =>
+      ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;",
+      })[s],
+  );
 }
 
 function setStatus(msg) {
@@ -42,7 +46,9 @@ async function loadCustomers() {
     return;
   }
 
-  tbody.innerHTML = json.data.map(c => `
+  tbody.innerHTML = json.data
+    .map(
+      (c) => `
     <tr>
       <td>${c.id}</td>
       <td>${escapeHtml(c.first_name)} ${escapeHtml(c.last_name)}</td>
@@ -58,14 +64,18 @@ async function loadCustomers() {
         <button data-action="delete" data-id="${c.id}">Delete</button>
       </td>
     </tr>
-  `).join("");
+  `,
+    )
+    .join("");
 
   setStatus(`Loaded ${json.data.length} customers.`);
 }
 
 // ---------- READ ONE (for edit) ----------
 async function getCustomer(id) {
-  const res = await fetch(`/api/customers/get.php?id=${encodeURIComponent(id)}`);
+  const res = await fetch(
+    `/api/customers/get.php?id=${encodeURIComponent(id)}`,
+  );
   const json = await res.json();
   if (!json.ok) {
     setStatus("Get failed: " + (json.error || "unknown"));
@@ -78,8 +88,8 @@ async function getCustomer(id) {
 async function createCustomer(payload) {
   const res = await fetch("/api/customers/create.php", {
     method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify(payload)
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
   });
   return await res.json();
 }
@@ -88,8 +98,8 @@ async function createCustomer(payload) {
 async function updateCustomer(payload) {
   const res = await fetch("/api/customers/update.php", {
     method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify(payload)
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
   });
   return await res.json();
 }
@@ -98,8 +108,8 @@ async function updateCustomer(payload) {
 async function deleteCustomer(id) {
   const res = await fetch("/api/customers/delete.php", {
     method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({ id })
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id }),
   });
   return await res.json();
 }
@@ -118,7 +128,6 @@ form.addEventListener("submit", async (e) => {
     street: street.value.trim() || null,
     zip: zip.value.trim() || null,
     city: city.value.trim() || null,
-
   };
 
   if (!payload.first_name || !payload.last_name) {
@@ -197,4 +206,3 @@ tbody.addEventListener("click", async (e) => {
 
 // initial load
 loadCustomers();
-

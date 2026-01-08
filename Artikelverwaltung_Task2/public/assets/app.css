@@ -1,2 +1,7 @@
-body {background: #f8f9fa}
-.table td, .table th {vertical-align: middle;}
+body {
+  background: #f8f9fa;
+}
+.table td,
+.table th {
+  vertical-align: middle;
+}

@@ -15,12 +15,22 @@ $(function () {
 
   let allCategories = []; // cached for rendering checkboxes + filter
 
-  function setStatus(msg) { $status.text(msg); }
+  function setStatus(msg) {
+    $status.text(msg);
+  }
 
   function escapeHtml(str) {
-    return String(str).replace(/[&<>"']/g, s => ({
-      "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"
-    }[s]));
+    return String(str).replace(
+      /[&<>"']/g,
+      (s) =>
+        ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#039;",
+        })[s],
+    );
   }
 
   function debounce(fn, ms) {
@@ -34,8 +44,11 @@ $(function () {
       allCategories = json.data || [];
 
       // Filter dropdown
-      const options = ['<option value="">All categories</option>']
-        .concat(allCategories.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`));
+      const options = ['<option value="">All categories</option>'].concat(
+        allCategories.map(
+          (c) => `<option value="${c.id}">${escapeHtml(c.name)}</option>`,
+        ),
+      );
       $filterCategory.html(options.join(""));
 
       // Modal checkboxes
@@ -45,22 +58,30 @@ $(function () {
 
   function renderCategoryCheckboxes(selectedIds) {
     const set = new Set((selectedIds || []).map(Number));
-    const html = allCategories.map(c => `
+    const html = allCategories
+      .map(
+        (c) => `
       <div class="col-md-4">
         <div class="form-check border rounded-2 p-2 bg-light">
           <input class="form-check-input cat-check" type="checkbox" value="${c.id}" id="cat_${c.id}" ${set.has(Number(c.id)) ? "checked" : ""}>
           <label class="form-check-label" for="cat_${c.id}">${escapeHtml(c.name)}</label>
         </div>
       </div>
-    `).join("");
+    `,
+      )
+      .join("");
 
-    $categoryCheckboxes.html(html || `<div class="text-muted">No categories found.</div>`);
+    $categoryCheckboxes.html(
+      html || `<div class="text-muted">No categories found.</div>`,
+    );
   }
 
   function getSelectedCategoryIds() {
-    return $(".cat-check:checked").map(function () {
-      return Number($(this).val());
-    }).get();
+    return $(".cat-check:checked")
+      .map(function () {
+        return Number($(this).val());
+      })
+      .get();
   }
 
   function loadArticles() {
@@ -74,9 +95,12 @@ $(function () {
 
     $.get("/api/articles/list.php", params)
       .done(function (json) {
-        if (!json.ok) return setStatus("Load failed: " + (json.error || "unknown"));
+        if (!json.ok)
+          return setStatus("Load failed: " + (json.error || "unknown"));
 
-        const rows = (json.data || []).map(a => `
+        const rows = (json.data || [])
+          .map(
+            (a) => `
           <tr>
             <td>${a.id}</td>
             <td>
@@ -91,9 +115,14 @@ $(function () {
               <button class="btn btn-sm btn-outline-danger" data-action="delete" data-id="${a.id}">Delete</button>
             </td>
           </tr>
-        `).join("");
+        `,
+          )
+          .join("");
 
-        $tbody.html(rows || `<tr><td colspan="6" class="text-muted">No articles.</td></tr>`);
+        $tbody.html(
+          rows ||
+            `<tr><td colspan="6" class="text-muted">No articles.</td></tr>`,
+        );
         setStatus(`Loaded ${(json.data || []).length} articles.`);
       })
       .fail(() => setStatus("Request failed (network/server)."));
@@ -120,20 +149,21 @@ $(function () {
   }
 
   function getArticle(id) {
-    return $.get("/api/articles/get.php", { id })
-      .then(function (json) {
-        if (!json.ok) throw new Error(json.error || "Failed to load article");
-        return json.data;
-      });
+    return $.get("/api/articles/get.php", { id }).then(function (json) {
+      if (!json.ok) throw new Error(json.error || "Failed to load article");
+      return json.data;
+    });
   }
 
   function saveArticle(payload, isUpdate) {
-    const url = isUpdate ? "/api/articles/update.php" : "/api/articles/create.php";
+    const url = isUpdate
+      ? "/api/articles/update.php"
+      : "/api/articles/create.php";
     return $.ajax({
       url,
       method: "POST",
       contentType: "application/json",
-      data: JSON.stringify(payload)
+      data: JSON.stringify(payload),
     });
   }
 
@@ -142,14 +172,16 @@ $(function () {
       url: "/api/articles/delete.php",
       method: "POST",
       contentType: "application/json",
-      data: JSON.stringify({ id })
+      data: JSON.stringify({ id }),
     });
   }
 
   $("#btnNew").on("click", openNew);
   $("#btnReload").on("click", loadArticles);
 
-  $search.on("input", function () { debounce(loadArticles, 250); });
+  $search.on("input", function () {
+    debounce(loadArticles, 250);
+  });
   $filterCategory.on("change", loadArticles);
 
   $tbody.on("click", "button[data-action]", function () {
@@ -160,8 +192,9 @@ $(function () {
       if (!confirm("Really delete this article?")) return;
       setStatus("Deleting...");
       deleteArticle(id)
-        .done(json => {
-          if (!json.ok) return setStatus("Delete failed: " + (json.error || "unknown"));
+        .done((json) => {
+          if (!json.ok)
+            return setStatus("Delete failed: " + (json.error || "unknown"));
           setStatus("Deleted.");
           loadArticles();
         })
@@ -173,7 +206,7 @@ $(function () {
       getArticle(id)
         .then(openEdit)
         .then(() => setStatus("Ready."))
-        .catch(err => setStatus(err.message));
+        .catch((err) => setStatus(err.message));
     }
   });
 
@@ -187,7 +220,8 @@ $(function () {
     const category_ids = getSelectedCategoryIds();
 
     if (!name) return setStatus("Name is required.");
-    if (price === "" || Number(price) < 0) return setStatus("Price must be >= 0.");
+    if (price === "" || Number(price) < 0)
+      return setStatus("Price must be >= 0.");
 
     setStatus("Saving...");
     const payload = { name, price, description, category_ids };
@@ -195,7 +229,8 @@ $(function () {
 
     saveArticle(payload, !!id)
       .done(function (json) {
-        if (!json.ok) return setStatus("Save failed: " + (json.error || "unknown"));
+        if (!json.ok)
+          return setStatus("Save failed: " + (json.error || "unknown"));
         modal.hide();
         setStatus(id ? "Updated." : "Created.");
         loadArticles();
@@ -206,5 +241,5 @@ $(function () {
   // init
   loadCategoriesForUI()
     .then(loadArticles)
-    .catch(err => setStatus(err.message));
+    .catch((err) => setStatus(err.message));
 });
